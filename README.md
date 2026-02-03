@@ -6,7 +6,6 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-blue)
 ![Swift](https://img.shields.io/badge/Swift-5.9-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Features
 
@@ -26,7 +25,7 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 1. Clone the repository:
    ```bash
    git clone https://github.com/oahnuj/endless.txt.git
-   cd endless.txt/NvrEndingTxt
+   cd endless.txt/endless.txt
    ```
 
 2. Install XcodeGen (if not already installed):
@@ -94,7 +93,3 @@ All entries are stored as plain text in `~/Documents/nvr-ending.txt`:
 ## Credits
 
 Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/productivity_text_file/)
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details
