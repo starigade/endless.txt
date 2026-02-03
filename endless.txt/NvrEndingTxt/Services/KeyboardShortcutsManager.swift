@@ -37,6 +37,9 @@ final class KeyboardShortcutsManager {
     private init() {}
 
     func setupShortcuts() {
+        // Clean up stale shortcuts from previous versions
+        cleanupLegacyShortcuts()
+
         // Search
         KeyboardShortcuts.onKeyDown(for: .toggleSearch) {
             NotificationCenter.default.post(name: .toggleSearch, object: nil)
@@ -78,7 +81,17 @@ final class KeyboardShortcutsManager {
 
         // Display
         KeyboardShortcuts.onKeyDown(for: .toggleTimestamps) {
-            AppSettings.shared.showTimestamps.toggle()
+            AppSettings.shared.displayTimestamps.toggle()
+        }
+    }
+
+    /// Remove shortcuts from previous versions that are no longer used
+    private func cleanupLegacyShortcuts() {
+        let legacyKeys = [
+            "KeyboardShortcuts_focusQuickNote"
+        ]
+        for key in legacyKeys {
+            UserDefaults.standard.removeObject(forKey: key)
         }
     }
 

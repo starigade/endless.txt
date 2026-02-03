@@ -174,7 +174,8 @@ final class AppSettings: ObservableObject {
 
     @AppStorage("fontSize") var fontSize: Double = 13
     @AppStorage("fontName") var fontName: String = "SF Mono"
-    @AppStorage("showTimestamps") var showTimestamps: Bool = true
+    @AppStorage("displayTimestamps") var displayTimestamps: Bool = true
+    @AppStorage("addTimestampsToEntries") var addTimestampsToEntries: Bool = true
     @AppStorage("timestampFormat") var timestampFormat: String = "yyyy-MM-dd HH:mm"
     @AppStorage("themeName") var themeName: String = "Light"
     @AppStorage("timezoneId") var timezoneId: String = "system"

@@ -169,10 +169,17 @@ struct GeneralSettingsView: View {
                         }
                     }
 
-                    Button("Reveal in Finder") {
-                        revealFile()
+                    HStack {
+                        Button("Reveal in Finder") {
+                            revealFile()
+                        }
+                        .font(.caption)
+
+                        Button("Reload File") {
+                            FileService.shared.loadContent()
+                        }
+                        .font(.caption)
                     }
-                    .font(.caption)
                 }
 
                 Section("Timezone") {
@@ -189,9 +196,19 @@ struct GeneralSettingsView: View {
                         .monospacedDigit()
                 }
 
-                Section("Entries") {
-                    Toggle("Show timestamps", isOn: $settings.showTimestamps)
+                Section("Timestamps") {
+                    Toggle("Display timestamps", isOn: $settings.displayTimestamps)
+                    Text("Show or hide timestamps in the editor (⌥⌘T)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
+                    Toggle("Add timestamps to new entries", isOn: $settings.addTimestampsToEntries)
+                    Text("Automatically prepend timestamp when submitting")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Section("Entries") {
                     Toggle("Auto-insert day separator", isOn: $settings.autoInsertDaySeparator)
                     Text("Adds \"---\" between entries from different days")
                         .font(.caption)

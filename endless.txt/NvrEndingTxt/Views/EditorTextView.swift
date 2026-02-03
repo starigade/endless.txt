@@ -72,6 +72,7 @@ struct EditorTextView: NSViewRepresentable {
         // Set initial text
         textView.string = text
         applyStrikethroughStyling(to: textView)
+        applyTimestampStyling(to: textView)
 
         // Store reference to text view in coordinator
         context.coordinator.textView = textView
@@ -102,8 +103,9 @@ struct EditorTextView: NSViewRepresentable {
         // Apply theme changes
         applyTheme(to: textView)
 
-        // Apply strikethrough styling
+        // Apply text styling
         applyStrikethroughStyling(to: textView)
+        applyTimestampStyling(to: textView)
 
         // Update search highlights if search is active and query changed
         if searchState.isVisible && !searchState.query.isEmpty {
@@ -168,6 +170,29 @@ struct EditorTextView: NSViewRepresentable {
                 let endMarkerRange = NSRange(location: match.range.location + match.range.length - 2, length: 2)
                 textStorage.addAttribute(.foregroundColor, value: NSColor(theme.secondaryTextColor).withAlphaComponent(0.5), range: startMarkerRange)
                 textStorage.addAttribute(.foregroundColor, value: NSColor(theme.secondaryTextColor).withAlphaComponent(0.5), range: endMarkerRange)
+            }
+        }
+    }
+
+    private func applyTimestampStyling(to textView: NSTextView) {
+        guard let textStorage = textView.textStorage else { return }
+
+        let fullRange = NSRange(location: 0, length: textStorage.length)
+        let theme = settings.theme
+
+        // Find timestamp patterns like [2024-02-03 14:30] or [2024-02-03 14:30:00]
+        let pattern = "\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}(:\\d{2})?\\]"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return }
+
+        let matches = regex.matches(in: textView.string, options: [], range: fullRange)
+
+        for match in matches {
+            if settings.displayTimestamps {
+                // Show timestamps with subtle color
+                textStorage.addAttribute(.foregroundColor, value: NSColor(theme.timestampColor), range: match.range)
+            } else {
+                // Hide timestamps by making them invisible (but still in the document)
+                textStorage.addAttribute(.foregroundColor, value: NSColor.clear, range: match.range)
             }
         }
     }
@@ -564,18 +589,8 @@ class EditorNSTextView: NSTextView {
         super.keyDown(with: event)
     }
 
-    // Tab key is handled here, not in keyDown
-    override func insertTab(_ sender: Any?) {
-        let cursorPos = selectedRange().location
-        let length = (string as NSString).length
-
-        // If cursor is at end or document is empty, go to quick entry
-        if length == 0 || cursorPos >= length {
-            NotificationCenter.default.post(name: .focusQuickEntry, object: nil)
-            return
-        }
-
-        // Otherwise insert tab as normal
-        super.insertTab(sender)
+    // Shift+Tab always jumps to quick entry
+    override func insertBacktab(_ sender: Any?) {
+        NotificationCenter.default.post(name: .focusQuickEntry, object: nil)
     }
 }

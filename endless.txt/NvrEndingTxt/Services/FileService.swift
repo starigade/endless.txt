@@ -81,7 +81,7 @@ final class FileService: ObservableObject {
 
         let timestamp = formatTimestamp(Date())
         let entry: String
-        if settings.showTimestamps {
+        if settings.addTimestampsToEntries {
             entry = "\(prefix)\n[\(timestamp)] \(trimmed)\n"
         } else {
             entry = "\(prefix)\n\(trimmed)\n"
