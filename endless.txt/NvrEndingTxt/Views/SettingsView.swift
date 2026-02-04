@@ -3,6 +3,44 @@ import ServiceManagement
 import Carbon
 import KeyboardShortcuts
 
+// MARK: - Hide Scrollbar Modifier
+
+struct HideScrollbar: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                DispatchQueue.main.async {
+                    hideScrollbars()
+                }
+            }
+    }
+
+    private func hideScrollbars() {
+        for window in NSApplication.shared.windows {
+            hideScrollbarsIn(view: window.contentView)
+        }
+    }
+
+    private func hideScrollbarsIn(view: NSView?) {
+        guard let view = view else { return }
+
+        if let scrollView = view as? NSScrollView {
+            scrollView.hasVerticalScroller = false
+            scrollView.hasHorizontalScroller = false
+        }
+
+        for subview in view.subviews {
+            hideScrollbarsIn(view: subview)
+        }
+    }
+}
+
+extension View {
+    func hideScrollbar() -> some View {
+        modifier(HideScrollbar())
+    }
+}
+
 enum SettingsTab: Int, CaseIterable {
     case general = 0
     case appearance = 1
@@ -42,6 +80,7 @@ struct SettingsView: View {
                 .tag(SettingsTab.about)
         }
         .frame(width: 460, height: 480)
+        .hideScrollbar()
         .onAppear {
             if #available(macOS 13.0, *) {
                 launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -110,9 +149,8 @@ struct GeneralSettingsView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        ScrollView {
-            Form {
-                Section("Startup") {
+        Form {
+            Section("Startup") {
                     Toggle("Launch at login", isOn: $launchAtLogin)
                         .onChange(of: launchAtLogin) { newValue in
                             updateLaunchAtLogin(enabled: newValue)
@@ -225,10 +263,10 @@ struct GeneralSettingsView: View {
                     Toggle("Compact view", isOn: $settings.compactEntries)
                         .help("Remove extra line breaks between entries")
                 }
-            }
-            .formStyle(.grouped)
         }
-        .scrollIndicators(.hidden)
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .scrollIndicators(.never)
         .onAppear {
             checkLoginItemStatus()
             updateTimePreview()
@@ -341,74 +379,73 @@ struct AppearanceSettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
-        ScrollView {
-            Form {
-                Section("Theme") {
-                    Picker("Color Theme", selection: $settings.themeName) {
-                        ForEach(AppTheme.allCases) { theme in
-                            HStack(spacing: 8) {
-                                HStack(spacing: 4) {
-                                    Circle().fill(theme.backgroundColor).frame(width: 12, height: 12)
-                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 0.5))
-                                    Circle().fill(theme.textColor).frame(width: 12, height: 12)
-                                    Circle().fill(theme.accentColor).frame(width: 12, height: 12)
-                                }
-                                Text(theme.rawValue)
+        Form {
+            Section("Preview") {
+                ThemePreviewView()
+                    .frame(height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+            }
+
+            Section("Theme") {
+                Picker("Color Theme", selection: $settings.themeName) {
+                    ForEach(AppTheme.allCases) { theme in
+                        HStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                Circle().fill(theme.backgroundColor).frame(width: 12, height: 12)
+                                    .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 0.5))
+                                Circle().fill(theme.textColor).frame(width: 12, height: 12)
+                                Circle().fill(theme.accentColor).frame(width: 12, height: 12)
                             }
-                            .tag(theme.rawValue)
+                            Text(theme.rawValue)
                         }
-                    }
-                    .pickerStyle(.radioGroup)
-                }
-
-                Section("Window") {
-                    HStack {
-                        Text("Opacity")
-                        Slider(value: $settings.windowOpacity, in: 0.3...1.0, step: 0.05)
-                            .onChange(of: settings.windowOpacity) { _ in
-                                NotificationCenter.default.post(name: .windowOpacityChanged, object: nil)
-                            }
-                        Text("\(Int(settings.windowOpacity * 100))%")
-                            .font(.system(.caption, design: .monospaced))
-                            .frame(width: 36, alignment: .trailing)
+                        .tag(theme.rawValue)
                     }
                 }
+                .pickerStyle(.radioGroup)
+            }
 
-                Section("Font") {
-                    Picker("Family", selection: $settings.fontName) {
-                        Text("SF Mono").tag("SF Mono")
-                        Text("Menlo").tag("Menlo")
-                        Text("Monaco").tag("Monaco")
-                        Text("Courier New").tag("Courier New")
-                    }
-
-                    HStack {
-                        Text("Size")
-                        Slider(value: $settings.fontSize, in: 10...18, step: 1)
-                        Text("\(Int(settings.fontSize))pt")
-                            .font(.system(.caption, design: .monospaced))
-                            .frame(width: 32, alignment: .trailing)
-                    }
-                }
-
-                Section("Formatting") {
-                    Toggle("Enable markdown", isOn: $settings.enableMarkdown)
-                        .help("**bold**, *italic*, ~~strike~~, __underline__, URLs")
-                }
-
-                Section("Preview") {
-                    ThemePreviewView()
-                        .frame(height: 80)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                        )
+            Section("Window") {
+                HStack {
+                    Text("Opacity")
+                    Slider(value: $settings.windowOpacity, in: 0.3...1.0, step: 0.05)
+                        .onChange(of: settings.windowOpacity) { _ in
+                            NotificationCenter.default.post(name: .windowOpacityChanged, object: nil)
+                        }
+                    Text("\(Int(settings.windowOpacity * 100))%")
+                        .font(.system(.caption, design: .monospaced))
+                        .frame(width: 36, alignment: .trailing)
                 }
             }
-            .formStyle(.grouped)
+
+            Section("Font") {
+                Picker("Family", selection: $settings.fontName) {
+                    Text("SF Mono").tag("SF Mono")
+                    Text("Menlo").tag("Menlo")
+                    Text("Monaco").tag("Monaco")
+                    Text("Courier New").tag("Courier New")
+                }
+
+                HStack {
+                    Text("Size")
+                    Slider(value: $settings.fontSize, in: 10...18, step: 1)
+                    Text("\(Int(settings.fontSize))pt")
+                        .font(.system(.caption, design: .monospaced))
+                        .frame(width: 32, alignment: .trailing)
+                }
+            }
+
+            Section("Formatting") {
+                Toggle("Enable markdown", isOn: $settings.enableMarkdown)
+                    .help("**bold**, *italic*, ~~strike~~, __underline__, URLs")
+            }
         }
-        .scrollIndicators(.hidden)
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .scrollIndicators(.never)
     }
 }
 
@@ -419,81 +456,80 @@ struct ShortcutsSettingsView: View {
     @State private var isRecording = false
 
     var body: some View {
-        ScrollView {
-            Form {
-                Section("Global Shortcut") {
-                    HStack {
-                        Text("Open/Close App")
-                        Spacer()
-                        ShortcutRecorderView(
-                            shortcut: settings.toggleShortcut,
-                            isRecording: $isRecording
-                        ) { newShortcut in
-                            settings.toggleShortcut = newShortcut
-                        }
+        Form {
+            Section("Global Shortcut") {
+                HStack {
+                    Text("Open/Close App")
+                    Spacer()
+                    ShortcutRecorderView(
+                        shortcut: settings.toggleShortcut,
+                        isRecording: $isRecording
+                    ) { newShortcut in
+                        settings.toggleShortcut = newShortcut
                     }
-                }
-
-                Section("General") {
-                    HStack {
-                        Text("Submit Entry")
-                        Spacer()
-                        KeyboardShortcutBadge(shortcut: "⌘ ↵")
-                    }
-
-                    HStack {
-                        Text("Dismiss")
-                        Spacer()
-                        KeyboardShortcutBadge(shortcut: "Esc")
-                    }
-
-                    HStack {
-                        Text("Settings")
-                        Spacer()
-                        KeyboardShortcutBadge(shortcut: "⌘ ,")
-                    }
-
-                    HStack {
-                        Text("Cycle Focus")
-                        Spacer()
-                        KeyboardShortcutBadge(shortcut: "Tab / ⇧Tab")
-                    }
-
-                    KeyboardShortcuts.Recorder("Toggle Timestamps", name: .toggleTimestamps)
-                }
-
-                Section("Search") {
-                    KeyboardShortcuts.Recorder("Find", name: .toggleSearch)
-                    KeyboardShortcuts.Recorder("Find Next", name: .findNext)
-                    KeyboardShortcuts.Recorder("Find Previous", name: .findPrevious)
-                }
-
-                Section("Navigation") {
-                    KeyboardShortcuts.Recorder("Previous Day", name: .previousDay)
-                    KeyboardShortcuts.Recorder("Next Day", name: .nextDay)
-                    KeyboardShortcuts.Recorder("Previous Line End", name: .previousLineEnd)
-                    KeyboardShortcuts.Recorder("Next Line End", name: .nextLineEnd)
-                }
-
-                Section("Formatting") {
-                    KeyboardShortcuts.Recorder("Toggle Strikethrough", name: .toggleStrikethrough)
-                    KeyboardShortcuts.Recorder("Toggle Checkbox", name: .toggleCheckbox)
-                }
-
-                Section {
-                    Button("Reset All to Defaults") {
-                        KeyboardShortcuts.reset(.toggleSearch, .findNext, .findPrevious,
-                                               .previousDay, .nextDay, .previousLineEnd, .nextLineEnd,
-                                               .toggleStrikethrough, .toggleCheckbox, .toggleTimestamps)
-                        settings.toggleShortcut = ShortcutKey.defaultToggle
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
                 }
             }
-            .formStyle(.grouped)
+
+            Section("General") {
+                HStack {
+                    Text("Submit Entry")
+                    Spacer()
+                    KeyboardShortcutBadge(shortcut: "⌘ ↵")
+                }
+
+                HStack {
+                    Text("Dismiss")
+                    Spacer()
+                    KeyboardShortcutBadge(shortcut: "Esc")
+                }
+
+                HStack {
+                    Text("Settings")
+                    Spacer()
+                    KeyboardShortcutBadge(shortcut: "⌘ ,")
+                }
+
+                HStack {
+                    Text("Cycle Focus")
+                    Spacer()
+                    KeyboardShortcutBadge(shortcut: "Tab / ⇧Tab")
+                }
+
+                KeyboardShortcuts.Recorder("Toggle Timestamps", name: .toggleTimestamps)
+            }
+
+            Section("Search") {
+                KeyboardShortcuts.Recorder("Find", name: .toggleSearch)
+                KeyboardShortcuts.Recorder("Find Next", name: .findNext)
+                KeyboardShortcuts.Recorder("Find Previous", name: .findPrevious)
+            }
+
+            Section("Navigation") {
+                KeyboardShortcuts.Recorder("Previous Day", name: .previousDay)
+                KeyboardShortcuts.Recorder("Next Day", name: .nextDay)
+                KeyboardShortcuts.Recorder("Previous Line End", name: .previousLineEnd)
+                KeyboardShortcuts.Recorder("Next Line End", name: .nextLineEnd)
+            }
+
+            Section("Formatting") {
+                KeyboardShortcuts.Recorder("Toggle Strikethrough", name: .toggleStrikethrough)
+                KeyboardShortcuts.Recorder("Toggle Checkbox", name: .toggleCheckbox)
+            }
+
+            Section {
+                Button("Reset All to Defaults") {
+                    KeyboardShortcuts.reset(.toggleSearch, .findNext, .findPrevious,
+                                           .previousDay, .nextDay, .previousLineEnd, .nextLineEnd,
+                                           .toggleStrikethrough, .toggleCheckbox, .toggleTimestamps)
+                    settings.toggleShortcut = ShortcutKey.defaultToggle
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
+            }
         }
-        .scrollIndicators(.hidden)
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .scrollIndicators(.never)
     }
 }
 
@@ -576,14 +612,15 @@ struct KeyboardShortcutBadge: View {
 
     var body: some View {
         Text(shortcut)
-            .font(.system(.caption, design: .monospaced))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(Color(nsColor: .controlBackgroundColor))
-            .cornerRadius(4)
+            .font(.system(size: 13))
+            .foregroundColor(.secondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color(nsColor: .windowBackgroundColor))
+            .cornerRadius(6)
             .overlay(
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
             )
     }
 }
