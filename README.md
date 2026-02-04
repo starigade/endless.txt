@@ -21,6 +21,14 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 - **Launch at login** - Start automatically with your Mac
 - **Persistent window** - Remembers position and size
 
+## Download
+
+**[Download endless.txt.dmg](https://github.com/oahnuj/endless.txt/releases/latest)** (macOS 13.0+)
+
+1. Download `endless.txt.dmg` from the latest release
+2. Open the DMG and drag `endless.txt.app` to your Applications folder
+3. Launch from Applications or Spotlight
+
 ## Installation
 
 ### From Source

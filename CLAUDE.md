@@ -55,6 +55,27 @@ endless.txt/
     └── Views/               # ContentView, QuickEntryView, SettingsView, FloatingPanel
 ```
 
+## Distribution
+
+When packaging the app for release:
+- The app must be named **endless.txt** (not NvrEndingTxt)
+- The distributed `.app` bundle should be `endless.txt.app`
+- The ZIP file for distribution should be `endless.txt.zip`
+
+```bash
+# Build and package for distribution
+cd endless.txt
+xcodebuild -project NvrEndingTxt.xcodeproj -scheme NvrEndingTxt -configuration Release build CONFIGURATION_BUILD_DIR=dist
+cd dist
+cp -R NvrEndingTxt.app "endless.txt.app"
+hdiutil create -volname "endless.txt" -srcfolder "endless.txt.app" -ov -format UDZO endless.txt.dmg
+
+# Create GitHub release (requires gh CLI authenticated)
+gh release create v1.x.x --title "endless.txt v1.x.x" --notes "Release notes here" endless.txt.dmg
+```
+
+Note: The internal Xcode project uses `NvrEndingTxt` as the target name, but the user-facing app name is `endless.txt` (set via `CFBundleDisplayName` in Info.plist). The `.app` bundle must be renamed after building.
+
 ## Git Commits
 
 Do not include "Co-Authored-By: Claude" or any Claude co-author mentions in commit messages.
