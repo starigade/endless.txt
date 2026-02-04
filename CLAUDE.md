@@ -1,0 +1,60 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Build Commands
+
+```bash
+# Generate Xcode project (required before first build)
+cd endless.txt && xcodegen generate
+
+# Open in Xcode
+open endless.txt/NvrEndingTxt.xcodeproj
+
+# Build from command line
+xcodebuild -project endless.txt/NvrEndingTxt.xcodeproj -scheme NvrEndingTxt -configuration Debug build
+```
+
+**Prerequisites:** `brew install xcodegen`
+
+## Architecture
+
+This is a macOS menu bar app (no dock icon) for quick thought capture to a single text file.
+
+### Key Components
+
+- **AppDelegate** (`AppDelegate.swift`) - Central coordinator managing menu bar status item, floating panel lifecycle, and global hotkey registration. Implements `NSWindowDelegate` for window frame persistence.
+
+- **FloatingPanel** (`Views/FloatingPanel.swift`) - Custom `NSPanel` subclass that enables keyboard input on a borderless window. Required because standard `NSWindow` doesn't receive key events when borderless.
+
+- **HotkeyManager** (`Services/HotkeyManager.swift`) - Carbon API wrapper for system-wide keyboard shortcuts. Uses `RegisterEventHotKey` because there's no native Swift API for global hotkeys.
+
+- **FileService** (`Services/FileService.swift`) - Singleton handling text file I/O with 500ms debounced auto-save. Uses Combine's `@Published` for reactive UI updates.
+
+- **AppSettings** (`Models/AppSettings.swift`) - Singleton using `@AppStorage` for UserDefaults-backed preferences. Contains theme definitions (`AppTheme` enum) and shortcut key configuration.
+
+### Communication Patterns
+
+Cross-component communication uses `NotificationCenter`:
+- `.focusQuickEntry` - Focus the quick entry text field when panel opens
+- `.hotkeyChanged` - Re-register global hotkey when user changes shortcut
+
+### Window Behavior
+
+The app uses `NSApp.setActivationPolicy(.accessory)` combined with `LSUIElement = true` in Info.plist to hide from dock. The panel uses `.nonactivatingPanel` collection behavior to appear over other apps without stealing focus aggressively.
+
+## Project Structure
+
+```
+endless.txt/
+├── project.yml              # XcodeGen configuration
+└── NvrEndingTxt/
+    ├── Info.plist           # LSUIElement = true
+    ├── Services/            # FileService, HotkeyManager, LaunchAtLoginManager
+    ├── Models/              # AppSettings, themes
+    └── Views/               # ContentView, QuickEntryView, SettingsView, FloatingPanel
+```
+
+## Git Commits
+
+Do not include "Co-Authored-By: Claude" or any Claude co-author mentions in commit messages.

@@ -411,13 +411,13 @@ struct AppearanceSettingsView: View {
             Section("Window") {
                 HStack {
                     Text("Opacity")
-                    Slider(value: $settings.windowOpacity, in: 0.3...1.0, step: 0.05)
+                    Slider(value: $settings.windowOpacity, in: 0.3...1.0)
                         .onChange(of: settings.windowOpacity) { _ in
                             NotificationCenter.default.post(name: .windowOpacityChanged, object: nil)
                         }
-                    Text("\(Int(settings.windowOpacity * 100))%")
-                        .font(.system(.caption, design: .monospaced))
-                        .frame(width: 36, alignment: .trailing)
+                    Text("\(Int(round(settings.windowOpacity * 100)))%")
+                        .font(.system(.body, design: .monospaced))
+                        .frame(width: 45, alignment: .trailing)
                 }
             }
 
@@ -666,9 +666,11 @@ struct AboutView: View {
         VStack(spacing: 12) {
             Spacer()
 
-            Image(systemName: "text.alignleft")
-                .font(.system(size: 44))
-                .foregroundColor(.accentColor)
+            Image("AppLogo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             Text("endless.txt")
                 .font(.title2.bold())

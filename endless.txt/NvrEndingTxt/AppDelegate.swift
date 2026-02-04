@@ -32,7 +32,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "text.alignleft", accessibilityDescription: "NvrEndingTxt")
+            if let image = NSImage(named: "MenuBarIcon") {
+                image.isTemplate = true
+                button.image = image
+            } else {
+                button.image = NSImage(systemSymbolName: "text.alignleft", accessibilityDescription: "endless.txt")
+            }
             button.action = #selector(statusItemClicked)
             button.target = self
         }

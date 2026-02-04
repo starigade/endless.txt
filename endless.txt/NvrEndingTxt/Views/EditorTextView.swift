@@ -210,13 +210,21 @@ struct EditorTextView: NSViewRepresentable {
         // ~~strikethrough~~
         if let strikeRegex = try? NSRegularExpression(pattern: "~~(.+?)~~", options: []) {
             let matches = strikeRegex.matches(in: textView.string, options: [], range: fullRange)
+            let tinyFont = NSFont.systemFont(ofSize: 0.1)
             for match in matches {
-                textStorage.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, range: match.range)
+                // Apply strikethrough only to content (excluding markers)
+                if match.numberOfRanges > 1 {
+                    let contentRange = match.range(at: 1)
+                    textStorage.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, range: contentRange)
+                }
+                // Hide markers completely (tiny + invisible) for clean visual
                 if match.range.length >= 4 {
                     let startMarker = NSRange(location: match.range.location, length: 2)
                     let endMarker = NSRange(location: match.range.location + match.range.length - 2, length: 2)
-                    textStorage.addAttribute(.foregroundColor, value: NSColor(theme.secondaryTextColor).withAlphaComponent(0.3), range: startMarker)
-                    textStorage.addAttribute(.foregroundColor, value: NSColor(theme.secondaryTextColor).withAlphaComponent(0.3), range: endMarker)
+                    textStorage.addAttribute(.font, value: tinyFont, range: startMarker)
+                    textStorage.addAttribute(.foregroundColor, value: NSColor.clear, range: startMarker)
+                    textStorage.addAttribute(.font, value: tinyFont, range: endMarker)
+                    textStorage.addAttribute(.foregroundColor, value: NSColor.clear, range: endMarker)
                 }
             }
         }
