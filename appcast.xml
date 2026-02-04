@@ -24,8 +24,8 @@
             ]]></description>
             <enclosure url="https://github.com/oahnuj/endless.txt/releases/download/v1.0.0/endless.txt.dmg"
                        type="application/octet-stream"
-                       sparkle:edSignature="jiB4ww7tGzk6bm+X+2P88Rrn2NTRAHu7dKkQE/vYLxysNoPKnLSEeWtduZCFrp0Q3ZqUoIZmLnYsw8c2m2nJCA=="
-                       length="2910479"/>
+                       sparkle:edSignature="gMVph145hVf/7T05PbPvgNOjiRzD8l2ZTXoDOpGMdsDF6I3DvHu/jP7/uFE8v0OeVYAe9cqFXt9JGhP/BhSNDg=="
+                       length="2910642"/>
         </item>
     </channel>
 </rss>
