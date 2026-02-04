@@ -11,10 +11,13 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 
 - **Instant capture** - Global hotkey (⌘+Shift+Space) opens overlay in <200ms
 - **Menu bar app** - Lives quietly in your menu bar, no dock icon
-- **Plain text storage** - All thoughts saved to `~/Documents/nvr-ending.txt`
+- **Plain text storage** - All thoughts saved to `~/Documents/endless.txt` (customizable)
 - **Quick entry** - Timestamped entries with a single keystroke (⌘+Enter)
+- **Markdown support** - **bold**, *italic*, ~~strikethrough~~, __underline__, and clickable URLs
+- **Search** - Find text with ⌘F, navigate matches with ⌘G / ⌘⇧G
+- **Entry navigation** - Jump between notes with ⌘↑ / ⌘↓
 - **5 themes** - Light, Dark, Solarized Dark, Monokai, Nord
-- **Customizable shortcuts** - Change the global hotkey to your preference
+- **Customizable shortcuts** - Change all keyboard shortcuts to your preference
 - **Launch at login** - Start automatically with your Mac
 - **Persistent window** - Remembers position and size
 
@@ -43,12 +46,37 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 
 ## Usage
 
+### Keyboard Shortcuts
+
 | Shortcut | Action |
 |----------|--------|
 | ⌘+Shift+Space | Open/close overlay (customizable) |
 | ⌘+Enter | Submit quick entry |
 | Esc | Dismiss overlay |
 | ⌘+, | Open settings |
+| Tab / Shift+Tab | Cycle focus between editor and quick entry |
+
+#### Search
+| Shortcut | Action |
+|----------|--------|
+| ⌘+F | Open search |
+| ⌘+G | Find next match |
+| ⌘+Shift+G | Find previous match |
+
+#### Navigation
+| Shortcut | Action |
+|----------|--------|
+| ⌘+↑ | Jump to previous note (end of note) |
+| ⌘+↓ | Jump to next note (end of note) |
+| ⌘+Ctrl+↑ | Move to previous line end |
+| ⌘+Ctrl+↓ | Move to next line end |
+
+#### Formatting
+| Shortcut | Action |
+|----------|--------|
+| ⌘+Shift+X | Toggle strikethrough on current line |
+| ⌘+Shift+C | Toggle checkbox on current line |
+| ⌥+⌘+T | Toggle timestamp visibility |
 
 ### Quick Entry
 
@@ -58,32 +86,76 @@ The bottom section is for rapid thought capture. Type your thought and press ⌘
 [2024-02-03 14:30] Your thought here #idea
 ```
 
+Or with timestamp on a separate line (configurable in settings):
+
+```
+[2024-02-03 14:30]
+Your thought here #idea
+```
+
 ### Full Editor
 
 The top section shows your entire text file. Edit freely - changes auto-save.
+
+### Markdown
+
+The editor renders markdown formatting in real-time:
+
+- `**bold**` → **bold**
+- `*italic*` → *italic*
+- `~~strikethrough~~` → ~~strikethrough~~
+- `__underline__` → underlined text
+- URLs are automatically detected and made clickable
+
+### Checkboxes
+
+Toggle checkboxes with ⌘+Shift+C:
+
+```
+[ ] unchecked task
+[x] completed task
+```
 
 ## Settings
 
 Access settings via the menu bar icon or ⌘+,
 
-- **General** - Launch at login, file location, timezone
-- **Appearance** - Theme, font family, font size
-- **Shortcuts** - Customize the global hotkey
-- **About** - Version and credits
+- **General**
+  - Launch at login
+  - File location (customizable path)
+  - Timezone selection
+  - Timestamp display and position options
+  - Auto-insert day separators
+  - Compact view (remove extra line breaks)
+- **Appearance**
+  - Theme (5 options)
+  - Font family (SF Mono, Menlo, Monaco, Courier New)
+  - Font size
+  - Markdown toggle
+- **Shortcuts**
+  - Customize all keyboard shortcuts
+- **About**
+  - Version and credits
 
 ## File Format
 
-All entries are stored as plain text in `~/Documents/nvr-ending.txt`:
+All entries are stored as plain text in `~/Documents/endless.txt`:
 
 ```
 [2024-02-03 09:15] Morning standup notes #work
 - reviewed PR #234
 - need to fix auth bug
 
-[2024-02-03 10:42] idea: cache API responses #idea
+---
 
-[2024-02-03 14:30] meeting with design team
+[2024-02-04 10:42] idea: cache API responses #idea
+
+[2024-02-04 14:30] meeting with design team
+[ ] follow up on designs
+[x] send meeting notes
 ```
+
+Day separators (`---`) are automatically inserted between entries from different days.
 
 ## Requirements
 
@@ -91,5 +163,7 @@ All entries are stored as plain text in `~/Documents/nvr-ending.txt`:
 - Xcode 15+ (for building from source)
 
 ## Credits
+
+Built by [@starigade](https://github.com/oahnuj)
 
 Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/productivity_text_file/)
