@@ -157,6 +157,7 @@ Access settings via the menu bar icon or ⌘+,
   - Compact view (remove extra line breaks)
 - **Appearance**
   - Theme (5 options)
+  - Custom text color override
   - Font family (SF Mono, Menlo, Monaco, Courier New)
   - Font size
   - Markdown toggle

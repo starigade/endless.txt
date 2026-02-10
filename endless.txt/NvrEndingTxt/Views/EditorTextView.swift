@@ -217,6 +217,11 @@ struct EditorTextView: NSViewRepresentable {
         textView.textColor = settings.effectiveNSTextColor
         textView.font = NSFont(name: settings.fontName, size: settings.fontSize) ?? NSFont.monospacedSystemFont(ofSize: settings.fontSize, weight: .regular)
 
+        // Explicitly set typingAttributes foreground color — on macOS 15 Sequoia,
+        // textView.textColor doesn't reliably propagate to typingAttributes, causing
+        // newly typed text to default to black (invisible on dark themes)
+        textView.typingAttributes[.foregroundColor] = settings.effectiveNSTextColor
+
         // Insertion point (cursor) color
         textView.insertionPointColor = theme.nsAccentColor
 
@@ -469,9 +474,17 @@ struct EditorTextView: NSViewRepresentable {
             // Keep cursor visible (auto-scroll when typing at end)
             textView.scrollRangeToVisible(textView.selectedRange())
 
-            // Re-apply all styling and scan hashtags after text change
+            // Apply base foreground color SYNCHRONOUSLY to prevent invisible text flash
+            // on macOS 15 — without this, there's a frame between text insertion and the
+            // async styling callback where new characters have no foreground color attribute
+            if let textStorage = textView.textStorage, textStorage.length > 0 {
+                let fullRange = NSRange(location: 0, length: textStorage.length)
+                textStorage.addAttribute(.foregroundColor, value: parent.settings.effectiveNSTextColor, range: fullRange)
+            }
+
+            // Defer expensive regex-based styling (timestamps, markdown, hashtag scan)
             DispatchQueue.main.async { [weak self] in
-                self?.parent.applyTimestampStyling(to: textView)  // Sets base foreground color
+                self?.parent.applyTimestampStyling(to: textView)
                 self?.parent.applyMarkdownStyling(to: textView)
                 self?.parent.hashtagState.scanHashtags(in: textView.string)
                 self?.isUpdatingText = false
@@ -1040,6 +1053,9 @@ class EditorNSTextView: NSTextView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        // Force TextKit 1 — TextKit 2 (default on macOS 13+) has rendering regressions
+        // with custom NSTextView subclasses on macOS 14-15 (text same color as background)
+        let _ = self.layoutManager
         lastTextLength = string.count
 
         // Remove old observer

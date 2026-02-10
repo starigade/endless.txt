@@ -123,9 +123,21 @@ struct QuickEntryTextEditor: NSViewRepresentable {
         textView.font = NSFont(name: settings.fontName, size: settings.fontSize)
             ?? NSFont.monospacedSystemFont(ofSize: settings.fontSize, weight: .regular)
         textView.textColor = settings.effectiveNSTextColor
+        // Explicitly set typingAttributes — on macOS 15, textView.textColor doesn't
+        // reliably propagate, causing invisible text on dark themes
+        textView.typingAttributes[.foregroundColor] = settings.effectiveNSTextColor
         textView.insertionPointColor = settings.theme.nsAccentColor
         textView.backgroundColor = .clear
         scrollView.backgroundColor = .clear
+
+        // Apply foreground color directly to textStorage — on macOS 15, textView.textColor
+        // alone doesn't reliably color existing attributed text
+        if let textStorage = textView.textStorage, textStorage.length > 0 {
+            let fullRange = NSRange(location: 0, length: textStorage.length)
+            textStorage.beginEditing()
+            textStorage.addAttribute(.foregroundColor, value: settings.effectiveNSTextColor, range: fullRange)
+            textStorage.endEditing()
+        }
 
         // Handle focus
         if isFocused {
@@ -362,6 +374,9 @@ class QuickEntryNSTextView: NSTextView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        // Force TextKit 1 — TextKit 2 (default on macOS 13+) has rendering regressions
+        // with custom NSTextView subclasses on macOS 14-15
+        let _ = self.layoutManager
 
         // Dismiss autocomplete when window loses focus
         if let window = window {
