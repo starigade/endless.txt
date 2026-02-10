@@ -408,6 +408,36 @@ struct AppearanceSettingsView: View {
                 .pickerStyle(.radioGroup)
             }
 
+            Section("Text Color") {
+                Toggle("Use custom text color", isOn: $settings.useCustomTextColor)
+                    .onChange(of: settings.useCustomTextColor) { enabled in
+                        if enabled && settings.customTextColorHex.isEmpty {
+                            // Initialize to current theme's text color hex
+                            settings.customTextColorHex = settings.theme.textColorHex
+                        }
+                    }
+
+                if settings.useCustomTextColor {
+                    ColorPicker("Color", selection: Binding(
+                        get: {
+                            if settings.customTextColorHex.isEmpty {
+                                return settings.theme.textColor
+                            }
+                            return Color(hex: settings.customTextColorHex)
+                        },
+                        set: { newColor in
+                            if let cgColor = newColor.cgColor,
+                               let components = cgColor.components, components.count >= 3 {
+                                let r = Int(components[0] * 255)
+                                let g = Int(components[1] * 255)
+                                let b = Int(components[2] * 255)
+                                settings.customTextColorHex = String(format: "%02X%02X%02X", r, g, b)
+                            }
+                        }
+                    ), supportsOpacity: false)
+                }
+            }
+
             Section("Window") {
                 HStack {
                     Text("Opacity")
@@ -641,12 +671,12 @@ struct ThemePreviewView: View {
                     .foregroundColor(settings.theme.timestampColor)
                 Text("Sample thought with #idea tag")
                     .font(.custom(settings.fontName, size: settings.fontSize))
-                    .foregroundColor(settings.theme.textColor)
+                    .foregroundColor(settings.effectiveTextColor)
             } else {
                 // Left format: inline timestamp
                 Text("[2024-02-03 14:30] Sample thought with #idea tag")
                     .font(.custom(settings.fontName, size: settings.fontSize))
-                    .foregroundColor(settings.theme.textColor)
+                    .foregroundColor(settings.effectiveTextColor)
             }
             Text("Another line of text...")
                 .font(.custom(settings.fontName, size: settings.fontSize))

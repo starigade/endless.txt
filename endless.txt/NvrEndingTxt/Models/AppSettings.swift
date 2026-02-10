@@ -32,6 +32,16 @@ enum AppTheme: String, CaseIterable, Identifiable {
         }
     }
 
+    var textColorHex: String {
+        switch self {
+        case .light: return "1E1E1E"
+        case .dark: return "D4D4D4"
+        case .solarizedDark: return "839496"
+        case .monokai: return "F8F8F2"
+        case .nord: return "ECEFF4"
+        }
+    }
+
     var secondaryTextColor: Color {
         switch self {
         case .light: return Color(hex: "6E6E6E")
@@ -261,6 +271,10 @@ final class AppSettings: ObservableObject {
     @AppStorage("autoInsertDaySeparator") var autoInsertDaySeparator: Bool = true
     @AppStorage("compactEntries") var compactEntries: Bool = false
 
+    // Custom text color
+    @AppStorage("useCustomTextColor") var useCustomTextColor: Bool = false
+    @AppStorage("customTextColorHex") var customTextColorHex: String = ""
+
     // Shortcut settings
     @AppStorage("hotkeyCode") var hotkeyCode: Int = 49 // Space
     @AppStorage("hotkeyModifiers") var hotkeyModifiers: Int = 0x0300 // Cmd+Shift (0x0100 | 0x0200)
@@ -277,6 +291,22 @@ final class AppSettings: ObservableObject {
 
     var theme: AppTheme {
         AppTheme(rawValue: themeName) ?? .light
+    }
+
+    /// Text color respecting custom override — use this instead of `theme.textColor`
+    var effectiveTextColor: Color {
+        if useCustomTextColor && !customTextColorHex.isEmpty {
+            return Color(hex: customTextColorHex)
+        }
+        return theme.textColor
+    }
+
+    /// NSColor text color respecting custom override — use this instead of `theme.nsTextColor`
+    var effectiveNSTextColor: NSColor {
+        if useCustomTextColor && !customTextColorHex.isEmpty {
+            return NSColor(hex: customTextColorHex)
+        }
+        return theme.nsTextColor
     }
 
     var timezone: TimeZone {

@@ -23,7 +23,7 @@ struct QuickEntryView: View {
             // Text editor for quick entry - no scroll indicators
             QuickEntryTextEditor(text: $quickText, isFocused: _isFocused)
                 .font(.custom(settings.fontName, size: settings.fontSize))
-                .foregroundColor(settings.theme.textColor)
+                .foregroundColor(settings.effectiveTextColor)
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
         }
@@ -122,7 +122,7 @@ struct QuickEntryTextEditor: NSViewRepresentable {
         // Apply theme - use NSColor directly from hex for reliability on all macOS versions
         textView.font = NSFont(name: settings.fontName, size: settings.fontSize)
             ?? NSFont.monospacedSystemFont(ofSize: settings.fontSize, weight: .regular)
-        textView.textColor = settings.theme.nsTextColor
+        textView.textColor = settings.effectiveNSTextColor
         textView.insertionPointColor = settings.theme.nsAccentColor
         textView.backgroundColor = .clear
         scrollView.backgroundColor = .clear

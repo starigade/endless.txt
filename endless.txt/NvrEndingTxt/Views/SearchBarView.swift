@@ -18,7 +18,7 @@ struct SearchBarView: View {
             TextField("Search...", text: $searchState.query)
                 .textFieldStyle(.plain)
                 .font(.custom(settings.fontName, size: settings.fontSize - 2))
-                .foregroundColor(settings.theme.textColor)
+                .foregroundColor(settings.effectiveTextColor)
                 .focused($isSearchFieldFocused)
                 .frame(minWidth: 80, maxWidth: 120)
                 .onSubmit {

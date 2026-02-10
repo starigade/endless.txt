@@ -214,7 +214,7 @@ struct EditorTextView: NSViewRepresentable {
         textView.enclosingScrollView?.backgroundColor = theme.nsBackgroundColor
 
         // Text color and font
-        textView.textColor = theme.nsTextColor
+        textView.textColor = settings.effectiveNSTextColor
         textView.font = NSFont(name: settings.fontName, size: settings.fontSize) ?? NSFont.monospacedSystemFont(ofSize: settings.fontSize, weight: .regular)
 
         // Insertion point (cursor) color
@@ -223,7 +223,7 @@ struct EditorTextView: NSViewRepresentable {
         // Selection color
         textView.selectedTextAttributes = [
             .backgroundColor: theme.nsAccentColor.withAlphaComponent(0.3),
-            .foregroundColor: theme.nsTextColor
+            .foregroundColor: settings.effectiveNSTextColor
         ]
     }
 
@@ -376,7 +376,7 @@ struct EditorTextView: NSViewRepresentable {
         // On macOS 15+, textView.textColor doesn't reliably apply to attributed text,
         // so we must explicitly set foreground color for all text
         textStorage.addAttribute(.font, value: normalFont, range: fullRange)
-        textStorage.addAttribute(.foregroundColor, value: theme.nsTextColor, range: fullRange)
+        textStorage.addAttribute(.foregroundColor, value: settings.effectiveNSTextColor, range: fullRange)
 
         // Pattern for timestamp-only lines: line that contains only [timestamp] with optional whitespace
         let timestampOnlyLinePattern = "^[ \\t]*\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}(:\\d{2})?\\][ \\t]*\\n?"

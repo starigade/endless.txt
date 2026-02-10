@@ -162,7 +162,7 @@ struct ShortcutsHelpView: View {
                 HStack {
                     Text("Shortcuts")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(settings.theme.textColor)
+                        .foregroundColor(settings.effectiveTextColor)
                     Spacer()
                     Text("⌘?")
                         .font(.system(size: 10, design: .monospaced))
@@ -210,7 +210,7 @@ struct ShortcutsColumn: View {
                                 .padding(.vertical, 2)
                                 .background(theme.inputBackgroundColor)
                                 .cornerRadius(3)
-                                .foregroundColor(theme.textColor)
+                                .foregroundColor(AppSettings.shared.effectiveTextColor)
 
                             Text(shortcut.1)
                                 .font(.system(size: 10))
