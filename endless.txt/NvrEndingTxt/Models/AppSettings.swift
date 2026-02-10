@@ -133,6 +133,16 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .nord: return NSColor(hex: "616E88")
         }
     }
+
+    var nsInputBackgroundColor: NSColor {
+        switch self {
+        case .light: return NSColor(hex: "F5F5F5")
+        case .dark: return NSColor(hex: "252526")
+        case .solarizedDark: return NSColor(hex: "073642")
+        case .monokai: return NSColor(hex: "1E1F1C")
+        case .nord: return NSColor(hex: "3B4252")
+        }
+    }
 }
 
 // MARK: - Color Extension

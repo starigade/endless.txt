@@ -115,7 +115,19 @@ struct EditorTextView: NSViewRepresentable {
         scrollView.scrollerStyle = .overlay // Scrollbar only shows when scrolling
         scrollView.drawsBackground = false
 
-        let textView = EditorNSTextView()
+        // Create explicit TextKit 1 stack — on macOS 13+, NSTextView() defaults to
+        // TextKit 2, which has rendering regressions on macOS 14-15 (invisible text,
+        // foreground color ignored). Initializing with an explicit NSLayoutManager
+        // guarantees TextKit 1 from the start.
+        let textStorage = NSTextStorage()
+        let layoutManager = NSLayoutManager()
+        textStorage.addLayoutManager(layoutManager)
+        let textContainer = NSTextContainer()
+        textContainer.widthTracksTextView = true
+        textContainer.containerSize = NSSize(width: 0, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.addTextContainer(textContainer)
+
+        let textView = EditorNSTextView(frame: .zero, textContainer: textContainer)
         textView.delegate = context.coordinator
         textView.isEditable = true
         textView.isSelectable = true
@@ -126,15 +138,14 @@ struct EditorTextView: NSViewRepresentable {
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = false
         textView.isAutomaticSpellingCorrectionEnabled = false
-        textView.drawsBackground = false
+        textView.drawsBackground = true
+        textView.backgroundColor = settings.theme.nsBackgroundColor
         textView.textContainerInset = NSSize(width: 8, height: 8)
 
         // Enable undo
         textView.allowsUndo = true
 
-        // Configure text container for word wrap
-        textView.textContainer?.widthTracksTextView = true
-        textView.textContainer?.containerSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        // Configure for word wrap
         textView.isHorizontallyResizable = false
         textView.isVerticallyResizable = true
         textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
@@ -209,9 +220,11 @@ struct EditorTextView: NSViewRepresentable {
     private func applyTheme(to textView: NSTextView) {
         let theme = settings.theme
 
-        // Background - use NSColor directly from hex for reliability on all macOS versions
+        // Background - draw directly on the text view for reliability on macOS 15+
+        // (SwiftUI backgrounds behind NSViewRepresentable can be unreliable)
+        textView.drawsBackground = true
         textView.backgroundColor = theme.nsBackgroundColor
-        textView.enclosingScrollView?.backgroundColor = theme.nsBackgroundColor
+        textView.enclosingScrollView?.drawsBackground = false
 
         // Text color and font
         textView.textColor = settings.effectiveNSTextColor
@@ -1053,8 +1066,8 @@ class EditorNSTextView: NSTextView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        // Force TextKit 1 — TextKit 2 (default on macOS 13+) has rendering regressions
-        // with custom NSTextView subclasses on macOS 14-15 (text same color as background)
+        // Safety net: TextKit 1 is already forced via explicit NSLayoutManager stack
+        // in makeNSView, but re-assert here in case the view is moved between windows
         let _ = self.layoutManager
         lastTextLength = string.count
 
