@@ -77,9 +77,9 @@ struct QuickEntryView: View {
 struct QuickEntryTextEditor: NSViewRepresentable {
     @Binding var text: String
     @FocusState var isFocused: Bool
+    @ObservedObject private var settings = AppSettings.shared
 
     func makeNSView(context: Context) -> NSScrollView {
-        let settings = AppSettings.shared
         let scrollView = NSScrollView()
         scrollView.hasVerticalScroller = false
         scrollView.hasHorizontalScroller = false
@@ -125,8 +125,6 @@ struct QuickEntryTextEditor: NSViewRepresentable {
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let textView = scrollView.documentView as? NSTextView else { return }
-
-        let settings = AppSettings.shared
 
         // Update text if changed externally
         if textView.string != text && !context.coordinator.isUpdating {
