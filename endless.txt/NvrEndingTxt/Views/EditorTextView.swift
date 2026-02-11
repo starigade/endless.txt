@@ -1020,7 +1020,7 @@ struct EditorTextView: NSViewRepresentable {
             } else {
                 // Insert checkbox at line start (after any leading whitespace)
                 let trimmed = lineText.trimmingCharacters(in: .whitespaces)
-                let leadingSpaces = lineText.prefix(while: { $0.isWhitespace })
+                let leadingSpaces = lineText.prefix(while: { $0 == " " || $0 == "\t" })
                 newLineText = String(leadingSpaces) + "[ ] " + trimmed
                 if newLineText.hasSuffix("\n") == false && lineText.hasSuffix("\n") {
                     // Preserve newline if original had it
