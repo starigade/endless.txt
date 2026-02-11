@@ -9,6 +9,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
     case solarizedDark = "Solarized Dark"
     case monokai = "Monokai"
     case nord = "Nord"
+    case catppuccinLatte = "Catppuccin Latte"
+    case catppuccinFrappe = "Catppuccin Frappé"
+    case catppuccinMacchiato = "Catppuccin Macchiato"
+    case catppuccinMocha = "Catppuccin Mocha"
 
     var id: String { rawValue }
 
@@ -19,6 +23,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return Color(hex: "002B36")
         case .monokai: return Color(hex: "272822")
         case .nord: return Color(hex: "2E3440")
+        case .catppuccinLatte: return Color(hex: "EFF1F5")
+        case .catppuccinFrappe: return Color(hex: "303446")
+        case .catppuccinMacchiato: return Color(hex: "24273A")
+        case .catppuccinMocha: return Color(hex: "1E1E2E")
         }
     }
 
@@ -29,6 +37,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return Color(hex: "839496")
         case .monokai: return Color(hex: "F8F8F2")
         case .nord: return Color(hex: "ECEFF4")
+        case .catppuccinLatte: return Color(hex: "4C4F69")
+        case .catppuccinFrappe: return Color(hex: "C6D0F5")
+        case .catppuccinMacchiato: return Color(hex: "CAD3F5")
+        case .catppuccinMocha: return Color(hex: "CDD6F4")
         }
     }
 
@@ -39,6 +51,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return "839496"
         case .monokai: return "F8F8F2"
         case .nord: return "ECEFF4"
+        case .catppuccinLatte: return "4C4F69"
+        case .catppuccinFrappe: return "C6D0F5"
+        case .catppuccinMacchiato: return "CAD3F5"
+        case .catppuccinMocha: return "CDD6F4"
         }
     }
 
@@ -49,6 +65,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return Color(hex: "586E75")
         case .monokai: return Color(hex: "75715E")
         case .nord: return Color(hex: "4C566A")
+        case .catppuccinLatte: return Color(hex: "9CA0B0")
+        case .catppuccinFrappe: return Color(hex: "737994")
+        case .catppuccinMacchiato: return Color(hex: "6E738D")
+        case .catppuccinMocha: return Color(hex: "6C7086")
         }
     }
 
@@ -59,6 +79,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return Color(hex: "268BD2")
         case .monokai: return Color(hex: "A6E22E")
         case .nord: return Color(hex: "88C0D0")
+        case .catppuccinLatte: return Color(hex: "7287FD")
+        case .catppuccinFrappe: return Color(hex: "BABBF1")
+        case .catppuccinMacchiato: return Color(hex: "B7BDF8")
+        case .catppuccinMocha: return Color(hex: "B4BEFE")
         }
     }
 
@@ -69,6 +93,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return Color(hex: "073642")
         case .monokai: return Color(hex: "1E1F1C")
         case .nord: return Color(hex: "3B4252")
+        case .catppuccinLatte: return Color(hex: "E6E9EF")
+        case .catppuccinFrappe: return Color(hex: "292C3C")
+        case .catppuccinMacchiato: return Color(hex: "1E2030")
+        case .catppuccinMocha: return Color(hex: "181825")
         }
     }
 
@@ -79,6 +107,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return Color(hex: "657B83")
         case .monokai: return Color(hex: "75715E")
         case .nord: return Color(hex: "616E88")
+        case .catppuccinLatte: return Color(hex: "8C8FA1")
+        case .catppuccinFrappe: return Color(hex: "626880")
+        case .catppuccinMacchiato: return Color(hex: "5B6078")
+        case .catppuccinMocha: return Color(hex: "585B70")
         }
     }
 
@@ -91,6 +123,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return NSColor(hex: "002B36")
         case .monokai: return NSColor(hex: "272822")
         case .nord: return NSColor(hex: "2E3440")
+        case .catppuccinLatte: return NSColor(hex: "EFF1F5")
+        case .catppuccinFrappe: return NSColor(hex: "303446")
+        case .catppuccinMacchiato: return NSColor(hex: "24273A")
+        case .catppuccinMocha: return NSColor(hex: "1E1E2E")
         }
     }
 
@@ -101,6 +137,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return NSColor(hex: "839496")
         case .monokai: return NSColor(hex: "F8F8F2")
         case .nord: return NSColor(hex: "ECEFF4")
+        case .catppuccinLatte: return NSColor(hex: "4C4F69")
+        case .catppuccinFrappe: return NSColor(hex: "C6D0F5")
+        case .catppuccinMacchiato: return NSColor(hex: "CAD3F5")
+        case .catppuccinMocha: return NSColor(hex: "CDD6F4")
         }
     }
 
@@ -111,6 +151,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return NSColor(hex: "586E75")
         case .monokai: return NSColor(hex: "75715E")
         case .nord: return NSColor(hex: "4C566A")
+        case .catppuccinLatte: return NSColor(hex: "9CA0B0")
+        case .catppuccinFrappe: return NSColor(hex: "737994")
+        case .catppuccinMacchiato: return NSColor(hex: "6E738D")
+        case .catppuccinMocha: return NSColor(hex: "6C7086")
         }
     }
 
@@ -121,6 +165,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return NSColor(hex: "268BD2")
         case .monokai: return NSColor(hex: "A6E22E")
         case .nord: return NSColor(hex: "88C0D0")
+        case .catppuccinLatte: return NSColor(hex: "7287FD")
+        case .catppuccinFrappe: return NSColor(hex: "BABBF1")
+        case .catppuccinMacchiato: return NSColor(hex: "B7BDF8")
+        case .catppuccinMocha: return NSColor(hex: "B4BEFE")
         }
     }
 
@@ -131,6 +179,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return NSColor(hex: "657B83")
         case .monokai: return NSColor(hex: "75715E")
         case .nord: return NSColor(hex: "616E88")
+        case .catppuccinLatte: return NSColor(hex: "8C8FA1")
+        case .catppuccinFrappe: return NSColor(hex: "626880")
+        case .catppuccinMacchiato: return NSColor(hex: "5B6078")
+        case .catppuccinMocha: return NSColor(hex: "585B70")
         }
     }
 
@@ -141,6 +193,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .solarizedDark: return NSColor(hex: "073642")
         case .monokai: return NSColor(hex: "1E1F1C")
         case .nord: return NSColor(hex: "3B4252")
+        case .catppuccinLatte: return NSColor(hex: "E6E9EF")
+        case .catppuccinFrappe: return NSColor(hex: "292C3C")
+        case .catppuccinMacchiato: return NSColor(hex: "1E2030")
+        case .catppuccinMocha: return NSColor(hex: "181825")
         }
     }
 }

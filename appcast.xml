@@ -7,6 +7,25 @@
         <language>en</language>
 
         <item>
+            <title>Version 1.1.9</title>
+            <pubDate>Tue, 11 Feb 2026 00:00:00 +0000</pubDate>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>1.1.9</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>endless.txt 1.1.9</h2>
+                <p>Catppuccin themes</p>
+                <ul>
+                    <li>Added Catppuccin Latte, Frappé, Macchiato, and Mocha themes</li>
+                </ul>
+            ]]></description>
+            <enclosure url="https://github.com/starigade/endless.txt/releases/download/v1.1.9/endless.txt.dmg"
+                       type="application/octet-stream"
+                       sparkle:edSignature="DybWWGA8yM63awHWnr6v4GJqaC0hM5FPwgJX+HLkqRbwvqQzvPc8RXkAsSAZ2ZnYC1fKf7u3FuJ+2YevJDfFAQ=="
+                       length="3056669"/>
+        </item>
+
+        <item>
             <title>Version 1.1.8</title>
             <pubDate>Mon, 10 Feb 2026 00:00:00 +0000</pubDate>
             <sparkle:version>10</sparkle:version>
