@@ -7,6 +7,26 @@
         <language>en</language>
 
         <item>
+            <title>Version 1.1.14</title>
+            <pubDate>Tue, 18 Feb 2026 00:00:00 +0000</pubDate>
+            <sparkle:version>16</sparkle:version>
+            <sparkle:shortVersionString>1.1.14</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>endless.txt 1.1.14</h2>
+                <p>Sequoia text rendering fixes</p>
+                <ul>
+                    <li>Fixed text storage edit batch missing in typing handler (Sequoia rendering regression)</li>
+                    <li>Fixed typingAttributes load order so text is visible on first launch</li>
+                </ul>
+            ]]></description>
+            <enclosure url="https://github.com/starigade/endless.txt/releases/download/v1.1.14/endless.txt.dmg"
+                       type="application/octet-stream"
+                       sparkle:edSignature="ISCqBk62c4W5nytqZHCWzSIrkGuXWbXpQQqN3lpRSDvmKy/GM59aV1B1UpC6gbWkErjgIZ+Ggf8GAqqO6dr3DA=="
+                       length="3059185"/>
+        </item>
+
+        <item>
             <title>Version 1.1.13</title>
             <pubDate>Tue, 11 Feb 2026 00:00:00 +0000</pubDate>
             <sparkle:version>15</sparkle:version>
