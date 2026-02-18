@@ -156,11 +156,12 @@ struct EditorTextView: NSViewRepresentable {
 
         scrollView.documentView = textView
 
-        // Apply initial theme
-        applyTheme(to: textView)
-
-        // Set initial text
+        // Set initial text BEFORE applying theme — setting textView.string resets
+        // typingAttributes to defaults. Applying theme after ensures typingAttributes
+        // has the correct foreground color for the first keystroke. On Sequoia, the
+        // initial layout pass uses typingAttributes before updateNSView fires.
         textView.string = text
+        applyTheme(to: textView)
         applyTimestampStyling(to: textView)
         applyMarkdownStyling(to: textView)
 
@@ -490,10 +491,14 @@ struct EditorTextView: NSViewRepresentable {
 
             // Apply base foreground color SYNCHRONOUSLY to prevent invisible text flash
             // on macOS 15 — without this, there's a frame between text insertion and the
-            // async styling callback where new characters have no foreground color attribute
+            // async styling callback where new characters have no foreground color attribute.
+            // Must wrap in beginEditing/endEditing — on Sequoia, bare addAttribute calls
+            // during a delegate callback can leave the layout manager in a stale state.
             if let textStorage = textView.textStorage, textStorage.length > 0 {
                 let fullRange = NSRange(location: 0, length: textStorage.length)
+                textStorage.beginEditing()
                 textStorage.addAttribute(.foregroundColor, value: parent.settings.effectiveNSTextColor, range: fullRange)
+                textStorage.endEditing()
             }
 
             // Defer expensive regex-based styling (timestamps, markdown, hashtag scan)
