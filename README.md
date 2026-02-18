@@ -18,7 +18,7 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 - **Search** - Find text with ⌘F, navigate matches with ⌘G / ⌘⇧G
 - **Tag jump** - Jump between occurrences of the same hashtag with ⌘J
 - **Entry navigation** - Jump between notes with ⌘↑ / ⌘↓
-- **5 themes** - Light, Dark, Solarized Dark, Monokai, Nord
+- **9 themes** - Light, Dark, Solarized Dark, Monokai, Nord, and 4 Catppuccin variants (Latte, Frappe, Macchiato, Mocha)
 - **Customizable shortcuts** - Change all keyboard shortcuts to your preference
 - **Launch at login** - Start automatically with your Mac
 - **Persistent window** - Remembers position and size
@@ -156,7 +156,7 @@ Access settings via the menu bar icon or ⌘+,
   - Auto-insert day separators
   - Compact view (remove extra line breaks)
 - **Appearance**
-  - Theme (5 options)
+  - Theme (9 options)
   - Custom text color override
   - Font family (SF Mono, Menlo, Monaco, Courier New)
   - Font size
@@ -185,6 +185,18 @@ All entries are stored as plain text in `~/Documents/endless.txt`:
 ```
 
 Day separators (`---`) are automatically inserted between entries from different days.
+
+## Known Issues
+
+### Text may appear invisible on macOS 15 (Sequoia)
+
+Some users on macOS 15 Sequoia have experienced text rendering as invisible, particularly on dark themes. This is caused by an Apple regression in how `NSColor` bridges with SwiftUI colors — custom sRGB colors created via SwiftUI's `Color` type fail silently when converted to `NSColor`, resulting in text that's technically present but not visible.
+
+Multiple mitigations have been applied across releases v1.1.2 through v1.1.8, including forcing TextKit 1, applying foreground colors at multiple layers, and bypassing the SwiftUI color bridge entirely. These fixes resolve the issue for most users, but if you still experience invisible text:
+
+1. **Try switching themes** in Settings > Appearance
+2. **Enable custom text color** in Settings > Appearance and pick a visible color
+3. **File an issue** with your macOS version and theme — we're actively tracking this
 
 ## Requirements
 

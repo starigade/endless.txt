@@ -53,13 +53,17 @@ The app uses `NSApp.setActivationPolicy(.accessory)` combined with `LSUIElement 
 ## Project Structure
 
 ```
-endless.txt/
-├── project.yml              # XcodeGen configuration
-└── NvrEndingTxt/
-    ├── Info.plist           # LSUIElement = true
-    ├── Services/            # FileService, HotkeyManager, LaunchAtLoginManager
-    ├── Models/              # AppSettings, themes
-    └── Views/               # ContentView, QuickEntryView, SettingsView, FloatingPanel
+/
+├── appcast.xml              # Sparkle update feed (MUST be at repo root)
+├── CLAUDE.md
+└── endless.txt/
+    ├── project.yml          # XcodeGen configuration
+    ├── dist/                # Build output (gitignored)
+    └── NvrEndingTxt/
+        ├── Info.plist       # LSUIElement = true
+        ├── Services/        # FileService, HotkeyManager, LaunchAtLoginManager
+        ├── Models/          # AppSettings, themes
+        └── Views/           # ContentView, QuickEntryView, SettingsView, FloatingPanel
 ```
 
 ## Distribution
@@ -69,30 +73,60 @@ When packaging the app for release:
 - The distributed `.app` bundle should be `endless.txt.app`
 - The DMG for distribution should be `endless.txt.dmg`
 
-### Build and Package
+### Developer ID Signing
+
+The app is signed with **Developer ID Application: Jun Hao Lim (454K5WYH9Y)**.
+
+**Automated Build:** Use the provided build script for a complete Developer ID signed release:
+
+```bash
+cd endless.txt
+./build-release.sh
+```
+
+The script handles:
+1. Clean builds
+2. XcodeGen project regeneration
+3. Release build with Developer ID signing
+4. Code signature verification
+5. Optional notarization (recommended)
+6. DMG creation
+7. Sparkle signature generation
+
+### Manual Build (Advanced)
+
+If you need to build manually:
 
 ```bash
 cd endless.txt
 
-# Clean previous builds to avoid stale file errors
+# Clean and regenerate
 rm -rf ~/Library/Developer/Xcode/DerivedData/NvrEndingTxt-*
 rm -rf dist build
+xcodegen generate
 
-# Build release
-xcodebuild -project NvrEndingTxt.xcodeproj -scheme NvrEndingTxt -configuration Release build
+# Build with Developer ID
+xcodebuild \
+    -project NvrEndingTxt.xcodeproj \
+    -scheme NvrEndingTxt \
+    -configuration Release \
+    -derivedDataPath ./build \
+    CODE_SIGN_IDENTITY="Developer ID Application: Jun Hao Lim (454K5WYH9Y)" \
+    CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+    OTHER_CODE_SIGN_FLAGS="--timestamp" \
+    build
 
-# Copy to dist folder
-BUILD_DIR=$(xcodebuild -project NvrEndingTxt.xcodeproj -scheme NvrEndingTxt -configuration Release -showBuildSettings 2>/dev/null | grep ' BUILT_PRODUCTS_DIR' | awk '{print $3}')
+# Copy and verify
 mkdir -p dist
-cp -R "$BUILD_DIR/NvrEndingTxt.app" dist/
+cp -R ./build/Build/Products/Release/NvrEndingTxt.app dist/
+codesign --verify --deep --strict --verbose=2 dist/NvrEndingTxt.app
 
-# CRITICAL: Re-sign the app with consistent code signature
-# The Sparkle framework comes pre-signed, which can cause Team ID mismatch errors.
-# This step ensures all nested frameworks use the same ad-hoc signature.
+# Notarize (optional but recommended)
 cd dist
-xattr -cr NvrEndingTxt.app
-codesign --force --deep --sign - NvrEndingTxt.app
-codesign --verify --deep --strict NvrEndingTxt.app
+ditto -c -k --keepParent NvrEndingTxt.app NvrEndingTxt.zip
+xcrun notarytool submit NvrEndingTxt.zip --apple-id YOUR_APPLE_ID --team-id 454K5WYH9Y --wait
+xcrun stapler staple NvrEndingTxt.app
+rm NvrEndingTxt.zip
 
 # Rename and create DMG
 cp -R NvrEndingTxt.app "endless.txt.app"
@@ -105,21 +139,75 @@ rm -rf dmg_contents
 
 ### Code Signing Notes
 
-**Important:** The app bundles the Sparkle framework for auto-updates. Sparkle comes with its own code signature from the Sparkle developers. When distributing without an Apple Developer ID:
+**Developer ID Requirements:**
+- Hardened Runtime is enabled (`ENABLE_HARDENED_RUNTIME: YES`)
+- Entitlements disable App Sandbox (required for global hotkeys via Carbon API)
+- Additional entitlements allow loading Sparkle framework signed by different team
+- Code signature includes `--timestamp` for long-term validity
 
-1. The main app is signed ad-hoc (no Team ID)
-2. Sparkle has a different signature origin
-3. macOS will refuse to load the framework due to "different Team IDs" error
+**Notarization:**
+- Recommended for seamless user experience (no Gatekeeper warnings)
+- Requires Apple ID app-specific password (generate at appleid.apple.com)
+- Uses `notarytool` (modern replacement for `altool`)
+- Ticket is stapled to the app bundle before DMG creation
 
-**Solution:** Always run `codesign --force --deep --sign -` on the final `.app` bundle before distribution. This re-signs all nested frameworks with a consistent ad-hoc signature.
+### Complete Release Workflow
 
-### Create GitHub Release
+When releasing a new version, follow these steps in order:
 
-```bash
-gh release create v1.x.x --title "endless.txt v1.x.x" --notes "Release notes here" endless.txt.dmg
+**1. Update version numbers in `endless.txt/project.yml`:**
+```yaml
+MARKETING_VERSION: "1.x.x"      # User-visible version
+CURRENT_PROJECT_VERSION: "N"     # Build number (increment each release)
 ```
 
-Note: The internal Xcode project uses `NvrEndingTxt` as the target name, but the user-facing app name is `endless.txt` (set via `CFBundleDisplayName` in Info.plist). The `.app` bundle must be renamed after building.
+**2. Regenerate Xcode project and fix Info.plist:**
+```bash
+cd endless.txt
+xcodegen generate
+
+# xcodegen overwrites Info.plist with hardcoded versions - fix it:
+# Change CFBundleShortVersionString from "1.0" to "$(MARKETING_VERSION)"
+# Change CFBundleVersion from "1" to "$(CURRENT_PROJECT_VERSION)"
+```
+
+**3. Build, sign, and create DMG** (see Build and Package section above)
+
+**4. Sign DMG for Sparkle auto-updates:**
+```bash
+# Find sign_update tool (after building, it's in DerivedData)
+SIGN_TOOL=$(find ~/Library/Developer/Xcode/DerivedData -name "sign_update" -path "*/Sparkle/bin/*" 2>/dev/null | head -1)
+$SIGN_TOOL endless.txt.dmg
+# Copy the output signature for appcast.xml
+```
+
+**5. Update appcast.xml (IMPORTANT: at REPO ROOT, not in endless.txt/):**
+```bash
+# Edit /appcast.xml (NOT endless.txt/appcast.xml)
+# Add new <item> at the TOP with:
+# - sparkle:version = build number
+# - sparkle:shortVersionString = marketing version
+# - sparkle:edSignature = signature from step 4
+# - length = file size in bytes
+```
+
+**6. Commit and push:**
+```bash
+git add endless.txt/ appcast.xml
+git commit -m "Release v1.x.x"
+git push origin main
+```
+
+**7. Create GitHub release:**
+```bash
+gh release create v1.x.x --title "endless.txt v1.x.x" --notes "Release notes" endless.txt/dist/endless.txt.dmg
+```
+
+### Important Notes
+
+- **appcast.xml location:** Must be at REPO ROOT (`/appcast.xml`), not in `endless.txt/`. The SUFeedURL points to `https://raw.githubusercontent.com/.../main/appcast.xml`
+- **Info.plist versions:** xcodegen overwrites with hardcoded "1.0" - always check and fix after running `xcodegen generate`
+- The internal Xcode project uses `NvrEndingTxt` as the target name, but the user-facing app name is `endless.txt` (set via `CFBundleDisplayName` in Info.plist)
 
 ## Git Commits
 
