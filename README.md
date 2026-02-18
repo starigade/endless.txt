@@ -31,13 +31,7 @@ Inspired by [Jeff Huang's productivity text file](https://jeffhuang.com/producti
 2. Open the DMG and drag `endless.txt.app` to your Applications folder
 3. Launch from Applications or Spotlight
 
-### First Launch
-
-The app is signed with an Apple Developer ID certificate. On first launch, macOS may show a security prompt:
-
-**Right-click** the app → **Open** → Click **Open**
-
-This only needs to be done once. After that, the app opens normally.
+The app is signed and notarized with Apple Developer ID — it opens normally with no Gatekeeper warnings.
 
 ## Installation
 
