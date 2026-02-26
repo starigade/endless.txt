@@ -81,9 +81,10 @@ struct QuickEntryTextEditor: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
-        scrollView.hasVerticalScroller = false
+        scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
         scrollView.autohidesScrollers = true
+        scrollView.scrollerStyle = .overlay
         // Both scroll view and text view must draw background — if only the text view
         // draws it, the NSClipView's default white shows through when text is short
         scrollView.drawsBackground = true
@@ -113,9 +114,12 @@ struct QuickEntryTextEditor: NSViewRepresentable {
         textView.isAutomaticTextReplacementEnabled = false
         textView.isAutomaticSpellingCorrectionEnabled = false
 
-        // Configure for word wrap
+        // Configure for word wrap and vertical growth (enables scrolling)
         textView.isHorizontallyResizable = false
         textView.isVerticallyResizable = true
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.minSize = NSSize(width: 0, height: 0)
+        textView.autoresizingMask = [.width]
 
         scrollView.documentView = textView
         context.coordinator.textView = textView

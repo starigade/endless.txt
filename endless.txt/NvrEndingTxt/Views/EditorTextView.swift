@@ -182,6 +182,8 @@ struct EditorTextView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let textView = scrollView.documentView as? EditorNSTextView else { return }
 
+        var needsStyling = false
+
         // Only update text if it actually changed (avoid update loops)
         if textView.string != text {
             let selectedRanges = textView.selectedRanges
@@ -192,14 +194,23 @@ struct EditorTextView: NSViewRepresentable {
                range.location + range.length <= (text as NSString).length {
                 textView.setSelectedRange(range)
             }
+            needsStyling = true
         }
 
-        // Apply theme changes
-        applyTheme(to: textView)
+        // Only re-apply theme + styling when settings actually changed, not on every
+        // SwiftUI update. This prevents layout thrashing during normal typing — the
+        // textDidChange async block already handles per-keystroke styling.
+        let themeKey = "\(settings.theme.rawValue)-\(settings.fontName)-\(settings.fontSize)-\(settings.displayTimestamps)-\(settings.enableMarkdown)"
+        if context.coordinator.lastThemeKey != themeKey {
+            context.coordinator.lastThemeKey = themeKey
+            applyTheme(to: textView)
+            needsStyling = true
+        }
 
-        // Apply text styling (timestamp first as it resets fonts, then markdown)
-        applyTimestampStyling(to: textView)
-        applyMarkdownStyling(to: textView)
+        if needsStyling {
+            applyTimestampStyling(to: textView)
+            applyMarkdownStyling(to: textView)
+        }
 
         // Update search highlights if search is active and query changed
         if searchState.isVisible && !searchState.query.isEmpty {
@@ -451,6 +462,9 @@ struct EditorTextView: NSViewRepresentable {
 
         private var isUpdatingText = false
         private var lastCheckboxToggle: Date = .distantPast
+
+        /// Tracks last-applied theme/font so updateNSView only re-styles when settings change
+        var lastThemeKey: String = ""
 
         init(_ parent: EditorTextView) {
             self.parent = parent
