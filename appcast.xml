@@ -7,6 +7,25 @@
         <language>en</language>
 
         <item>
+            <title>Version 1.1.16</title>
+            <pubDate>Wed, 26 Feb 2026 00:00:00 +0000</pubDate>
+            <sparkle:version>18</sparkle:version>
+            <sparkle:shortVersionString>1.1.16</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>endless.txt 1.1.16</h2>
+                <p>Bug fixes</p>
+                <ul>
+                    <li>Clear editor selection when switching to quick entry</li>
+                </ul>
+            ]]></description>
+            <enclosure url="https://github.com/starigade/endless.txt/releases/download/v1.1.16/endless.txt.dmg"
+                       type="application/octet-stream"
+                       sparkle:edSignature="/2JplbnsQok/4azQbjwrAUb+WJHky4MInpEeykPZw8xGO7r37p3mv0dGvaJ4shoICJB5C/+FaLC/tCVU9aigAw=="
+                       length="3062780"/>
+        </item>
+
+        <item>
             <title>Version 1.1.15</title>
             <pubDate>Wed, 26 Feb 2026 00:00:00 +0000</pubDate>
             <sparkle:version>17</sparkle:version>
