@@ -1073,6 +1073,14 @@ class EditorNSTextView: NSTextView {
     weak var coordinator: EditorTextView.Coordinator?
     var onEscapePressed: (() -> Void)?
 
+    override func resignFirstResponder() -> Bool {
+        // Clear selection when losing focus to avoid the dark system inactive highlight
+        if selectedRange().length > 0 {
+            setSelectedRange(NSRange(location: selectedRange().location, length: 0))
+        }
+        return super.resignFirstResponder()
+    }
+
     // Autocomplete state
     private var autocompleteWindow: NSWindow?
     private var autocompleteStackView: NSStackView?

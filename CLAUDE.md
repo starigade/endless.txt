@@ -212,3 +212,7 @@ gh release create v1.x.x --title "endless.txt v1.x.x" --notes "Release notes" en
 ## Git Commits
 
 Do not include "Co-Authored-By: Claude" or any Claude co-author mentions in commit messages.
+
+## GitHub Account
+
+Before pushing, creating releases, or any `gh` commands for this repo, verify the active `gh` account is `oahnuj` (which has access to the `starigade` org). Run `gh auth status` to check, and `gh auth switch --user oahnuj` if needed. Switch back to the previous account after the operation.
